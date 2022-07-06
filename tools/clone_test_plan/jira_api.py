@@ -317,6 +317,29 @@ class JiraTask:
         except Exception as e:
             print(f"Exception {e} in adding te to tp")
 
+    def add_tests_to_exist_te(self, tests_list, existed_te):
+        """
+        add tests to test executiona
+        """
+        print("Adding tests {} to test executions {}".format(tests_list, existed_te))
+        try:
+            response = self.http.post(
+                "https://jts.seagate.com/rest/raven/1.0/api/testexec/" + existed_te + "/test",
+                headers={'Content-Type': 'application/json'}, json={"add": tests_list},
+                auth=(sepalf.jira_id, self.jira_ssword))
+            print(response.status_code)
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                print('JIRA Unauthorized access')
+                return False
+            elif response.status_code == HTTPStatus.SERVICE_UNAVAILABLE:
+                print('JIRA Service Unavailable')
+                return False
+            elif response.status_code != HTTPStatus.OK:
+                print('Error while adding tests to test execution')
+                return False
+        except Exception as e:
+            print(f"Exception {e} in adding tests to te")
+
     def add_tests_to_te_tp(self, new_te, new_tp, tp_info, test_list):
         """
         Add tests to test execution and test plan
